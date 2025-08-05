@@ -1,9 +1,6 @@
 package com.indianbank.controller;
 
-import com.indianbank.dto.BankResponse;
-import com.indianbank.dto.CreditDebitRequest;
-import com.indianbank.dto.EnquiryRequest;
-import com.indianbank.dto.UserDTO;
+import com.indianbank.dto.*;
 import com.indianbank.service.UserService;
 import com.indianbank.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +51,14 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         if(response.getAccountInfo() == null && response.getResponseMessage().equals(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE))
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<BankResponse> transfer(@RequestBody TransferRequest transferRequest) {
+        BankResponse response = userService.transfer(transferRequest);
+        if((response.getAccountInfo() == null && response.getResponseMessage().equals(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)) || response.getAccountInfo() == null && response.getResponseMessage().equals(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE))
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

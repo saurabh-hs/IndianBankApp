@@ -1,9 +1,6 @@
 package com.indianbank.service;
 
-import com.indianbank.dto.BankResponse;
-import com.indianbank.dto.CreditDebitRequest;
-import com.indianbank.dto.EnquiryRequest;
-import com.indianbank.dto.UserDTO;
+import com.indianbank.dto.*;
 
 public interface UserService {
     public BankResponse createAccount(UserDTO userDTO);
@@ -15,4 +12,6 @@ public interface UserService {
     public BankResponse creditAccount(CreditDebitRequest creditDebitRequest);
 
     public BankResponse debitAccount(CreditDebitRequest creditDebitRequest);
+
+    public BankResponse transfer(TransferRequest transferRequest);
 }
