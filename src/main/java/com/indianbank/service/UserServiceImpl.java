@@ -5,6 +5,7 @@ import com.indianbank.entity.User;
 import com.indianbank.repository.UserRepository;
 import com.indianbank.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,6 +22,9 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public BankResponse createAccount(UserDTO userDTO) {
@@ -47,6 +51,7 @@ public class UserServiceImpl implements UserService{
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
                 .email(userDTO.getEmail())
+                .password(passwordEncoder.encode(userDTO.getPassword()))
                 .phoneNumber(userDTO.getPhoneNumber())
                 .alternativePhoneNumber(userDTO.getAlternativePhoneNumber())
                 .status("ACTIVE")
