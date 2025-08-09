@@ -40,6 +40,12 @@ public class UserController {
             responseCode = "200",
             description = "Http Status 200 SUCCESS"
     )
+
+    @PostMapping("/login")
+    public BankResponse login(@RequestBody LoginDTO loginDTO) {
+        return userService.login(loginDTO);
+    }
+
     @GetMapping("/balanceEnquiry")
     public ResponseEntity<BankResponse> balanceEnquiry(@RequestBody EnquiryRequest request) {
         BankResponse response = userService.balanceEnquiry(request);

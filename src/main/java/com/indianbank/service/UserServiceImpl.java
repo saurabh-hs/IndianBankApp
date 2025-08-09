@@ -1,10 +1,15 @@
 package com.indianbank.service;
 
+import com.indianbank.config.JwtTokenProvider;
 import com.indianbank.dto.*;
+import com.indianbank.entity.Role;
 import com.indianbank.entity.User;
 import com.indianbank.repository.UserRepository;
 import com.indianbank.utils.AccountUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,12 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Override
     public BankResponse createAccount(UserDTO userDTO) {
@@ -55,6 +66,7 @@ public class UserServiceImpl implements UserService{
                 .phoneNumber(userDTO.getPhoneNumber())
                 .alternativePhoneNumber(userDTO.getAlternativePhoneNumber())
                 .status("ACTIVE")
+                .role(Role.valueOf("ADMIN"))
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -76,6 +88,27 @@ public class UserServiceImpl implements UserService{
                         .accountNumber(savedUser.getAccountNumber())
                         .accountName(savedUser.getFirstName() + " " + savedUser.getLastName() + " " + savedUser.getOtherName())
                         .build())
+                .build();
+    }
+
+    @Override
+    public BankResponse login(LoginDTO loginDTO) {
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
+        );
+
+        EmailDetails loginAlert = EmailDetails.builder()
+                .subject("You are logged in!")
+                .recipient(loginDTO.getEmail())
+                .messageBody("You logged into your account. If you didn't initiate this request, please contact your " +
+                        "bank")
+                .build();
+
+        emailService.sendEmailAlert(loginAlert);
+        return BankResponse.builder()
+                .responseCode("Login Success")
+                .responseMessage(jwtTokenProvider.generateToken(authentication))
                 .build();
     }
 
